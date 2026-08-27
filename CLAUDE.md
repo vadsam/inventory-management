@@ -40,6 +40,12 @@ uv run python main.py
 # Frontend
 cd client
 npm install && npm run dev
+
+# Backend tests (run from tests/ directory)
+cd tests
+uv run pytest                        # all tests
+uv run pytest backend/test_dashboard.py        # single file
+uv run pytest backend/test_dashboard.py::test_name  # single test
 ```
 
 ## Key Patterns
@@ -69,8 +75,19 @@ npm install && npm run dev
 - Data: `server/data/*.json`
 - Styles: `client/src/App.vue`
 
+## Layout Architecture
+The app uses a fixed left sidebar + scrollable content-wrapper split (not a traditional sticky top-nav):
+- `aside.sidebar` — `position: fixed`, width driven by `--sidebar-width` CSS var (240px expanded, 64px collapsed)
+- `div.content-wrapper` — `margin-left: var(--sidebar-width)`, adjusts automatically
+- Collapse state: `.app--collapsed` class on the root `.app` div drives both sidebar width and content margin via CSS descendant selectors
+- All layout tokens live in `:root` in `App.vue` — `--sidebar-width`, `--sidebar-collapsed-width`, `--sidebar-bg`, `--sidebar-active-bg`, `--content-bg`, etc.
+- `FilterBar` sticks to `top: 0` inside `.content-wrapper` (not `top: 70px` — there is no top nav)
+
 ## Design System
-- Colors: Slate/gray (#0f172a, #64748b, #e2e8f0)
+- Colors: Slate/gray (#0f172a, #64748b, #e2e8f0); sidebar: #1e293b bg / #cbd5e1 text / #2563eb active
 - Status: green/blue/yellow/red
 - Charts: Custom SVG, CSS Grid for layouts
 - No emojis in UI
+
+## Skills
+- **`vue-saas-redesign`** (global skill): Documents the sidebar layout pattern used in this app. Useful if re-applying or extending the layout on another Vue 3 project.
